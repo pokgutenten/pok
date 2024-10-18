@@ -82,8 +82,8 @@
             { meaning: "이, 이것", pinyin: "cǐ", numeric: "ci3" },
             { meaning: "격렬하다", pinyin: "jùliè", numeric: "ju4lie4" },
             { meaning: "흔들리다", pinyin: "yáohuàng", numeric: "yao2huang4" },
-            { meaning: "튼튼하다", pinyin: "jiéshi", numeric: "jie2shi5" }, // 성조 없는 음절은 숫자 없이 표기
-            { meaning: "장롱", pinyin: "guìzi", numeric: "gui4zi5" }, // 숫자 5는 성조 없음 표시
+            { meaning: "튼튼하다", pinyin: "jiéshi", numeric: "jie2shi" }, // 성조 없는 음절은 숫자 없이 표기
+            { meaning: "장롱", pinyin: "guìzi", numeric: "gui4zi" }, // 숫자 제거
             { meaning: "~하지 않도록", pinyin: "yǐmiǎn", numeric: "yi3mian3" },
             { meaning: "부수다", pinyin: "zá", numeric: "za2" },
             { meaning: "무게를 견디다", pinyin: "chéngzhòng", numeric: "cheng2zhong4" },
@@ -116,7 +116,6 @@
             { meaning: "멈추지 않다", pinyin: "bùzhǐ", numeric: "bu4zhi3" }
         ];
 
-
         // 숫자 병음을 성조 표기로 변환하는 함수
         function convertToPinyinWithTone(input) {
             const toneMap = {
@@ -127,83 +126,82 @@
             };
             const vowels = ['a', 'e', 'i', 'o', 'u', 'v']; // 'v' is for ü (u with umlaut)
 
-            let result = input;
-            for (let tone in toneMap) {
-                for (let i = 0; i < vowels.length; i++) {
-                    let vowel = vowels[i];
-                    let regex = new RegExp(vowel + tone, 'g');
-                    result = result.replace(regex, toneMap[tone][i]);
-                }
-            }
-            return result;
-        }
+let result = input;
+for (let tone in toneMap) {
+    for (let i = 0; i < vowels.length; i++) {
+        let vowel = vowels[i];
+        let regex = new RegExp(vowel + tone, 'g');
+        result = result.replace(regex, toneMap[tone][i]);
+    }
+}
+return result;
+}
 
-        let currentQuestionIndex = 0;
-        let score = 0;
-        let totalQuestions = words.length;
-        let usedIndices = [];
+// 성조가 없는 병음 처리를 위해서는 numeric 속성에서 숫자를 빼고 비교
+function checkAnswer() {
+const answer = document.getElementById("answer").value.trim();
+const numericAnswer = words[currentQuestionIndex].numeric.replace(/5/g, ''); // 경성 숫자 제거
+const pinyinAnswer = words[currentQuestionIndex].pinyin;
+const convertedAnswer = convertToPinyinWithTone(answer.replace(/\s/g, '')); // 공백 제거 후 변환
+const resultElement = document.getElementById("result");
 
-        // Enter 키로 제출하는 이벤트 추가
-        document.getElementById("answer").addEventListener("keydown", function(event) {
-            if (event.key === "Enter") {
-                checkAnswer();
-            }
-        });
+if (answer.replace(/\s/g, '') === numericAnswer || convertedAnswer === pinyinAnswer) {
+    resultElement.innerText = `정답이다냥! (${pinyinAnswer})`;
+    score++;
+} else {
+    resultElement.innerText = `아니다냥! 정답은 ${pinyinAnswer} 이다냥.`;
+}
 
-        function getRandomIndex() {
-            let index;
-            do {
-                index = Math.floor(Math.random() * words.length);
-            } while (usedIndices.includes(index));
-            usedIndices.push(index);
-            return index;
-        }
+if (usedIndices.length < totalQuestions) {
+    setTimeout(showQuestion, 2000);  // 2초 후 다음 문제로 이동
+} else {
+    resultElement.innerText += " 끝났다냥!";
+    document.getElementById("restart-btn").style.display = "inline";
+}
+}
 
-        function showQuestion() {
-            currentQuestionIndex = getRandomIndex();
-            const questionElement = document.getElementById("question");
-            questionElement.innerText = `뜻: ${words[currentQuestionIndex].meaning}`;
-            document.getElementById("answer").value = '';
-            document.getElementById("result").innerText = '';
-            updateProgress();
-        }
+// 진행 상황 업데이트
+function updateProgress() {
+const progressElement = document.getElementById("progress");
+progressElement.innerText = `${usedIndices.length}/${totalQuestions}`;
+}
 
-        function checkAnswer() {
-            const answer = document.getElementById("answer").value.trim();
-            const numericAnswer = words[currentQuestionIndex].numeric;
-            const pinyinAnswer = words[currentQuestionIndex].pinyin;
-            const convertedAnswer = convertToPinyinWithTone(answer.replace(/\s/g, '')); // 공백 제거 후 변환
-            const resultElement = document.getElementById("result");
+// 퀴즈 다시 시작
+function restartQuiz() {
+usedIndices = [];
+score = 0;
+document.getElementById("restart-btn").style.display = "none";
+showQuestion();
+}
 
-            // 숫자 병음 또는 성조 병음과 비교
-            if (answer === numericAnswer || convertedAnswer === pinyinAnswer) {
-                resultElement.innerText = `정답이다냥! (${pinyinAnswer})`;
-                score++;
-            } else {
-                resultElement.innerText = `아니다냥! 정답은 ${pinyinAnswer} 이다냥.`;
-            }
+// 랜덤으로 새로운 질문 표시
+function getRandomIndex() {
+let index;
+do {
+    index = Math.floor(Math.random() * words.length);
+} while (usedIndices.includes(index));
+usedIndices.push(index);
+return index;
+}
 
-            if (usedIndices.length < totalQuestions) {
-                setTimeout(showQuestion, 2000);  // 3초 후 다음 문제로 이동
-            } else {
-                resultElement.innerText += " 끝났다냥!";
-                document.getElementById("restart-btn").style.display = "inline";
-            }
-        }
+// 첫 질문 표시
+function showQuestion() {
+currentQuestionIndex = getRandomIndex();
+const questionElement = document.getElementById("question");
+questionElement.innerText = `뜻: ${words[currentQuestionIndex].meaning}`;
+document.getElementById("answer").value = '';
+document.getElementById("result").innerText = '';
+updateProgress();
+}
 
-        function updateProgress() {
-            const progressElement = document.getElementById("progress");
-            progressElement.innerText = `${usedIndices.length}/${totalQuestions}`;
-        }
+// Enter 키로 제출하는 이벤트 추가
+document.getElementById("answer").addEventListener("keydown", function(event) {
+if (event.key === "Enter") {
+    checkAnswer();
+}
+});
 
-        function restartQuiz() {
-            usedIndices = [];
-            score = 0;
-            document.getElementById("restart-btn").style.display = "none";
-            showQuestion();
-        }
-
-        window.onload = showQuestion;
-    </script>
+window.onload = showQuestion;
+</script>
 </body>
 </html>
