@@ -47,6 +47,29 @@
             50% { transform: translateY(-20px); }
             100% { transform: translateY(0); }
         }
+
+        @media (max-width: 600px) {
+            body {
+                padding: 10px;
+                font-size: 14px; /* 글씨 크기 축소 */
+            }
+            #quiz-container {
+                padding: 15px;
+                box-shadow: none; /* 모바일에서 그림자 제거 */
+            }
+            #cat {
+                width: 80px; /* 고양이 크기 더 축소 */
+                bottom: -30px;
+                right: -30px;
+            }
+            button, input {
+                font-size: 14px; /* 모바일 화면에서는 텍스트 크기를 줄임 */
+            }
+            #progress {
+                font-size: 16px; /* 진행률 텍스트도 조금 더 작게 */
+            }
+        }
+
     </style>
 </head>
 <body>
