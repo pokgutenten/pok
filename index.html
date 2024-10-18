@@ -109,8 +109,8 @@
             { meaning: "이, 이것", pinyin: "cǐ", numeric: "ci3" },
             { meaning: "격렬하다", pinyin: "jùliè", numeric: "ju4lie4" },
             { meaning: "흔들리다", pinyin: "yáohuàng", numeric: "yao2huang4" },
-            { meaning: "튼튼하다", pinyin: "jiéshi", numeric: "jie2shi" }, // 성조 없는 음절은 숫자 없이 표기
-            { meaning: "장롱", pinyin: "guìzi", numeric: "gui4zi" }, // 숫자 제거
+            { meaning: "튼튼하다", pinyin: "jiéshi", numeric: "jie2shi" },
+            { meaning: "장롱", pinyin: "guìzi", numeric: "gui4zi" },
             { meaning: "~하지 않도록", pinyin: "yǐmiǎn", numeric: "yi3mian3" },
             { meaning: "부수다", pinyin: "zá", numeric: "za2" },
             { meaning: "무게를 견디다", pinyin: "chéngzhòng", numeric: "cheng2zhong4" },
@@ -133,7 +133,7 @@
             { meaning: "분명하다", pinyin: "qīng", numeric: "qing1" },
             { meaning: "장소", pinyin: "chǎngdì", numeric: "chang3di4" },
             { meaning: "전원", pinyin: "diànyuán", numeric: "dian4yuan2" },
-            { meaning: "던지다", pinyin: "tóu", numeric: "tou2" },
+            { meaning: "던지다", pinyin: "tou2" },
             { meaning: "수영하다", pinyin: "yóu", numeric: "you2" },
             { meaning: "언덕", pinyin: "shānpō", numeric: "shan1po1" },
             { meaning: "전이하다", pinyin: "zhuǎnyí", numeric: "zhuan3yi2" },
@@ -142,6 +142,12 @@
             { meaning: "~에 이르지 않다", pinyin: "búzhìyú", numeric: "bu2zhi4yu2" },
             { meaning: "멈추지 않다", pinyin: "bùzhǐ", numeric: "bu4zhi3" }
         ];
+
+        let currentQuestionIndex = 0;
+        let score = 0;
+        let totalQuestions = words.length;
+        let usedIndices = [];
+        let wrongAnswers = []; // 오답을 저장할 배열
 
         // 숫자 병음을 성조 표기로 변환하는 함수
         function convertToPinyinWithTone(input) {
@@ -153,82 +159,94 @@
             };
             const vowels = ['a', 'e', 'i', 'o', 'u', 'v']; // 'v' is for ü (u with umlaut)
 
-let result = input;
-for (let tone in toneMap) {
-    for (let i = 0; i < vowels.length; i++) {
-        let vowel = vowels[i];
-        let regex = new RegExp(vowel + tone, 'g');
-        result = result.replace(regex, toneMap[tone][i]);
-    }
-}
-return result;
-}
+            let result = input;
+            for (let tone in toneMap) {
+                for (let i = 0; i < vowels.length; i++) {
+                    let vowel = vowels[i];
+                    let regex = new RegExp(vowel + tone, 'g');
+                    result = result.replace(regex, toneMap[tone][i]);
+                }
+            }
+            return result;
+        }
 
-// 성조가 없는 병음 처리를 위해서는 numeric 속성에서 숫자를 빼고 비교
-function checkAnswer() {
-const answer = document.getElementById("answer").value.trim();
-const numericAnswer = words[currentQuestionIndex].numeric.replace(/5/g, ''); // 경성 숫자 제거
-const pinyinAnswer = words[currentQuestionIndex].pinyin;
-const convertedAnswer = convertToPinyinWithTone(answer.replace(/\s/g, '')); // 공백 제거 후 변환
-const resultElement = document.getElementById("result");
+        // 오답 리스트 표시 함수
+        function displayWrongAnswers() {
+            const wrongList = document.getElementById("wrong-words");
+            wrongList.innerHTML = ''; // 기존 오답 리스트 초기화
+            wrongAnswers.forEach((word) => {
+                const listItem = document.createElement("li");
+                listItem.innerText = `뜻: ${word.meaning}, 병음: ${word.pinyin}`;
+                wrongList.appendChild(listItem);
+            });
+            document.getElementById("wrong-answers").style.display = "block"; // 오답 섹션 표시
+        }
 
-if (answer.replace(/\s/g, '') === numericAnswer || convertedAnswer === pinyinAnswer) {
-    resultElement.innerText = `정답이다냥! (${pinyinAnswer})`;
-    score++;
-} else {
-    resultElement.innerText = `아니다냥! 정답은 ${pinyinAnswer} 이다냥.`;
-}
+        function checkAnswer() {
+            const answer = document.getElementById("answer").value.trim();
+            const numericAnswer = words[currentQuestionIndex].numeric.replace(/5/g, ''); // 경성 숫자 제거
+            const pinyinAnswer = words[currentQuestionIndex].pinyin;
+            const convertedAnswer = convertToPinyinWithTone(answer.replace(/\s/g, '')); // 공백 제거 후 변환
+            const resultElement = document.getElementById("result");
 
-if (usedIndices.length < totalQuestions) {
-    setTimeout(showQuestion, 2000);  // 2초 후 다음 문제로 이동
-} else {
-    resultElement.innerText += " 끝났다냥!";
-    document.getElementById("restart-btn").style.display = "inline";
-}
-}
+            if (answer.replace(/\s/g, '') === numericAnswer || convertedAnswer === pinyinAnswer) {
+                resultElement.innerText = `정답이다냥! (${pinyinAnswer})`;
+                score++;
+            } else {
+                resultElement.innerText = `아니다냥! 정답은 ${pinyinAnswer} 이다냥.`;
+                wrongAnswers.push(words[currentQuestionIndex]); // 오답 저장
+            }
 
-// 진행 상황 업데이트
-function updateProgress() {
-const progressElement = document.getElementById("progress");
-progressElement.innerText = `${usedIndices.length}/${totalQuestions}`;
-}
+            if (usedIndices.length < totalQuestions) {
+                setTimeout(showQuestion, 2000);  // 2초 후 다음 문제로 이동
+            } else {
+                resultElement.innerText += " 끝났다냥!";
+                displayWrongAnswers(); // 퀴즈 종료 후 오답 리스트 표시
+                document.getElementById("restart-btn").style.display = "inline";
+            }
+        }
 
-// 퀴즈 다시 시작
-function restartQuiz() {
-usedIndices = [];
-score = 0;
-document.getElementById("restart-btn").style.display = "none";
-showQuestion();
-}
+        function updateProgress() {
+            const progressElement = document.getElementById("progress");
+            progressElement.innerText = `${usedIndices.length}/${totalQuestions}`;
+        }
 
-// 랜덤으로 새로운 질문 표시
-function getRandomIndex() {
-let index;
-do {
-    index = Math.floor(Math.random() * words.length);
-} while (usedIndices.includes(index));
-usedIndices.push(index);
-return index;
-}
+        function restartQuiz() {
+            usedIndices = [];
+            score = 0;
+            wrongAnswers = []; // 오답 초기화
+            document.getElementById("restart-btn").style.display = "none";
+            document.getElementById("wrong-answers").style.display = "none"; // 오답 섹션 숨기기
+            showQuestion();
+        }
 
-// 첫 질문 표시
-function showQuestion() {
-currentQuestionIndex = getRandomIndex();
-const questionElement = document.getElementById("question");
-questionElement.innerText = `뜻: ${words[currentQuestionIndex].meaning}`;
-document.getElementById("answer").value = '';
-document.getElementById("result").innerText = '';
-updateProgress();
-}
+        function getRandomIndex() {
+            let index;
+            do {
+                index = Math.floor(Math.random() * words.length);
+            } while (usedIndices.includes(index));
+            usedIndices.push(index);
+            return index;
+        }
 
-// Enter 키로 제출하는 이벤트 추가
-document.getElementById("answer").addEventListener("keydown", function(event) {
-if (event.key === "Enter") {
-    checkAnswer();
-}
-});
+        function showQuestion() {
+            currentQuestionIndex = getRandomIndex();
+            const questionElement = document.getElementById("question");
+            questionElement.innerText = `뜻: ${words[currentQuestionIndex].meaning}`;
+            document.getElementById("answer").value = '';
+            document.getElementById("result").innerText = '';
+            updateProgress();
+        }
 
-window.onload = showQuestion;
-</script>
+        // Enter 키로 제출하는 이벤트 추가
+        document.getElementById("answer").addEventListener("keydown", function(event) {
+            if (event.key === "Enter") {
+                checkAnswer();
+            }
+        });
+
+        window.onload = showQuestion;
+    </script>
 </body>
 </html>
+
