@@ -184,23 +184,28 @@
             document.getElementById("wrong-answers").style.display = "block"; // 오답 섹션 표시
         }
 
+        // checkAnswer 함수에서 오답을 추가할 때 중복 방지
         function checkAnswer() {
             const answer = document.getElementById("answer").value.trim();
             const numericAnswer = words[currentQuestionIndex].numeric.replace(/5/g, ''); // 경성 숫자 제거
             const pinyinAnswer = words[currentQuestionIndex].pinyin;
             const convertedAnswer = convertToPinyinWithTone(answer.replace(/\s/g, '')); // 공백 제거 후 변환
             const resultElement = document.getElementById("result");
-
+        
             if (answer.replace(/\s/g, '') === numericAnswer || convertedAnswer === pinyinAnswer) {
                 resultElement.innerText = `정답이다냥! (${pinyinAnswer})`;
                 score++;
             } else {
                 resultElement.innerText = `아니다냥! 정답은 ${pinyinAnswer} 이다냥.`;
-                wrongAnswers.push(words[currentQuestionIndex]); // 오답 저장
+        
+                // 중복 오답 추가 방지
+                if (!wrongAnswers.some(word => word.meaning === words[currentQuestionIndex].meaning)) {
+                    wrongAnswers.push(words[currentQuestionIndex]); // 오답 저장
+                }
             }
-
+        
             if (usedIndices.length < totalQuestions) {
-                setTimeout(showQuestion, 500);  // 1.5초 후 다음 문제로 이동
+                setTimeout(showQuestion, 500);  // 0.5초 후 다음 문제로 이동
             } else {
                 resultElement.innerText += " 끝났다냥!";
                 displayWrongAnswers(); // 오답 리스트 표시
@@ -208,6 +213,7 @@
                 document.getElementById("wrong-quiz-btn").style.display = "inline"; // 오답 퀴즈 버튼 표시
             }
         }
+
 
         function updateProgress() {
             const progressElement = document.getElementById("progress");
