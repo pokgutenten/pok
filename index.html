@@ -51,7 +51,7 @@
 </head>
 <body>
     <div id="quiz-container">
-        <h1>생중 병음 퀴즈</h1>
+        <h1>병음 퀴즈</h1>
         <p id="progress">1/50</p>
         <p id="question">뜻: 재난</p>
         <input type="text" id="answer" placeholder="병음을 숫자와 함께 입력하세요 (예: shun4)">
@@ -63,58 +63,59 @@
     </div>
 
     <script>
-       const words = [
-    { meaning: "재난", pinyin: "zāinàn" },
-    { meaning: "생존", pinyin: "shēngcún" },
-    { meaning: "기술", pinyin: "jìqiǎo" },
-    { meaning: "지진", pinyin: "dìzhèn" },
-    { meaning: "전혀 없음", pinyin: "háo wú" },
-    { meaning: "위기", pinyin: "wēijī" },
-    { meaning: "대단히", pinyin: "wànfēn" },
-    { meaning: "긴급하다", pinyin: "jǐnjí" },
-    { meaning: "갖추다", pinyin: "jùbèi" },
-    { meaning: "상처", pinyin: "shāng" },
-    { meaning: "결과", pinyin: "hòuguǒ" },
-    { meaning: "~하기 어렵다", pinyin: "nányǐ" },
-    { meaning: "가정하다", pinyin: "jiǎshè" },
-    { meaning: "제공하다", pinyin: "tígōng" },
-    { meaning: "탈출하다", pinyin: "táoshēng" },
-    { meaning: "이, 이것", pinyin: "cǐ" },
-    { meaning: "격렬하다", pinyin: "jùliè" },
-    { meaning: "흔들리다", pinyin: "yáohuàng" },
-    { meaning: "튼튼하다", pinyin: "jiéshi" },
-    { meaning: "장롱", pinyin: "guìzi" },
-    { meaning: "~하지 않도록", pinyin: "yǐmiǎn" },
-    { meaning: "부수다", pinyin: "zá" },
-    { meaning: "무게를 견디다", pinyin: "chéngzhòng" },
-    { meaning: "~하기보다는", pinyin: "yǔqí" },
-    { meaning: "차라리", pinyin: "nìngkě" },
-    { meaning: "만약 ~가 아니라면", pinyin: "chúfēi" },
-    { meaning: "폐허", pinyin: "fèixū" },
-    { meaning: "냉정하다", pinyin: "lěngjìng" },
-    { meaning: "발신하다", pinyin: "fāchū" },
-    { meaning: "신호", pinyin: "xìnhào" },
-    { meaning: "연기", pinyin: "yānwù" },
-    { meaning: "불이 붙다", pinyin: "zháohuǒ" },
-    { meaning: "하다, 만들다", pinyin: "nòng" },
-    { meaning: "접다", pinyin: "dié" },
-    { meaning: "해롭다", pinyin: "yǒuhài" },
-    { meaning: "기체", pinyin: "qìtǐ" },
-    { meaning: "일으키다", pinyin: "dǎozhì" },
-    { meaning: "화재", pinyin: "huǒzāi" },
-    { meaning: "자세", pinyin: "zīshì" },
-    { meaning: "분명하다", pinyin: "qīng" },
-    { meaning: "장소", pinyin: "chǎngdì" },
-    { meaning: "전원", pinyin: "diànyuán" },
-    { meaning: "던지다", pinyin: "tóu" },
-    { meaning: "수영하다", pinyin: "yóu" },
-    { meaning: "언덕", pinyin: "shānpō" },
-    { meaning: "전이하다", pinyin: "zhuǎnyí" },
-    { meaning: "같은 방향으로", pinyin: "shùn" },
-    { meaning: "피하다", pinyin: "bì" },
-    { meaning: "~에 이르지 않다", pinyin: "búzhìyú" },
-    { meaning: "멈추지 않다", pinyin: "bùzhǐ" }
-];
+        const words = [
+            { meaning: "재난", pinyin: "zāinàn", numeric: "zai1nan4" },
+            { meaning: "생존", pinyin: "shēngcún", numeric: "sheng1cun2" },
+            { meaning: "기술", pinyin: "jìqiǎo", numeric: "ji4qiao3" },
+            { meaning: "지진", pinyin: "dìzhèn", numeric: "di4zhen4" },
+            { meaning: "전혀 없음", pinyin: "háo wú", numeric: "hao2 wu2" },
+            { meaning: "위기", pinyin: "wēijī", numeric: "wei1ji1" },
+            { meaning: "대단히", pinyin: "wànfēn", numeric: "wan4fen1" },
+            { meaning: "긴급하다", pinyin: "jǐnjí", numeric: "jin3ji2" },
+            { meaning: "갖추다", pinyin: "jùbèi", numeric: "ju4bei4" },
+            { meaning: "상처", pinyin: "shāng", numeric: "shang1" },
+            { meaning: "결과", pinyin: "hòuguǒ", numeric: "hou4guo3" },
+            { meaning: "~하기 어렵다", pinyin: "nányǐ", numeric: "nan2yi3" },
+            { meaning: "가정하다", pinyin: "jiǎshè", numeric: "jia3she4" },
+            { meaning: "제공하다", pinyin: "tígōng", numeric: "ti2gong1" },
+            { meaning: "탈출하다", pinyin: "táoshēng", numeric: "tao2sheng1" },
+            { meaning: "이, 이것", pinyin: "cǐ", numeric: "ci3" },
+            { meaning: "격렬하다", pinyin: "jùliè", numeric: "ju4lie4" },
+            { meaning: "흔들리다", pinyin: "yáohuàng", numeric: "yao2huang4" },
+            { meaning: "튼튼하다", pinyin: "jiéshi", numeric: "jie2shi5" }, // 성조 없는 음절은 숫자 없이 표기
+            { meaning: "장롱", pinyin: "guìzi", numeric: "gui4zi5" }, // 숫자 5는 성조 없음 표시
+            { meaning: "~하지 않도록", pinyin: "yǐmiǎn", numeric: "yi3mian3" },
+            { meaning: "부수다", pinyin: "zá", numeric: "za2" },
+            { meaning: "무게를 견디다", pinyin: "chéngzhòng", numeric: "cheng2zhong4" },
+            { meaning: "~하기보다는", pinyin: "yǔqí", numeric: "yu3qi2" },
+            { meaning: "차라리", pinyin: "nìngkě", numeric: "ning4ke3" },
+            { meaning: "만약 ~가 아니라면", pinyin: "chúfēi", numeric: "chu2fei1" },
+            { meaning: "폐허", pinyin: "fèixū", numeric: "fei4xu1" },
+            { meaning: "냉정하다", pinyin: "lěngjìng", numeric: "leng3jing4" },
+            { meaning: "발신하다", pinyin: "fāchū", numeric: "fa1chu1" },
+            { meaning: "신호", pinyin: "xìnhào", numeric: "xin4hao4" },
+            { meaning: "연기", pinyin: "yānwù", numeric: "yan1wu4" },
+            { meaning: "불이 붙다", pinyin: "zháohuǒ", numeric: "zhao2huo3" },
+            { meaning: "하다, 만들다", pinyin: "nòng", numeric: "nong4" },
+            { meaning: "접다", pinyin: "dié", numeric: "die2" },
+            { meaning: "해롭다", pinyin: "yǒuhài", numeric: "you3hai4" },
+            { meaning: "기체", pinyin: "qìtǐ", numeric: "qi4ti3" },
+            { meaning: "일으키다", pinyin: "dǎozhì", numeric: "dao3zhi4" },
+            { meaning: "화재", pinyin: "huǒzāi", numeric: "huo3zai1" },
+            { meaning: "자세", pinyin: "zīshì", numeric: "zi1shi4" },
+            { meaning: "분명하다", pinyin: "qīng", numeric: "qing1" },
+            { meaning: "장소", pinyin: "chǎngdì", numeric: "chang3di4" },
+            { meaning: "전원", pinyin: "diànyuán", numeric: "dian4yuan2" },
+            { meaning: "던지다", pinyin: "tóu", numeric: "tou2" },
+            { meaning: "수영하다", pinyin: "yóu", numeric: "you2" },
+            { meaning: "언덕", pinyin: "shānpō", numeric: "shan1po1" },
+            { meaning: "전이하다", pinyin: "zhuǎnyí", numeric: "zhuan3yi2" },
+            { meaning: "같은 방향으로", pinyin: "shùn", numeric: "shun4" },
+            { meaning: "피하다", pinyin: "bì", numeric: "bi4" },
+            { meaning: "~에 이르지 않다", pinyin: "búzhìyú", numeric: "bu2zhi4yu2" },
+            { meaning: "멈추지 않다", pinyin: "bùzhǐ", numeric: "bu4zhi3" }
+        ];
+
 
         // 숫자 병음을 성조 표기로 변환하는 함수
         function convertToPinyinWithTone(input) {
@@ -171,9 +172,10 @@
             const answer = document.getElementById("answer").value.trim();
             const numericAnswer = words[currentQuestionIndex].numeric;
             const pinyinAnswer = words[currentQuestionIndex].pinyin;
-            const convertedAnswer = convertToPinyinWithTone(answer);
+            const convertedAnswer = convertToPinyinWithTone(answer.replace(/\s/g, '')); // 공백 제거 후 변환
             const resultElement = document.getElementById("result");
 
+            // 숫자 병음 또는 성조 병음과 비교
             if (answer === numericAnswer || convertedAnswer === pinyinAnswer) {
                 resultElement.innerText = `정답이다냥! (${pinyinAnswer})`;
                 score++;
